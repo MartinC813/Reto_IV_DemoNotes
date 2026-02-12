@@ -1,12 +1,6 @@
-
 pipeline {
-    agent any
+  agent any
 
-    stages {
-        stage('Hello') {
-            steps {
-                echo 'Hello World'
-            }
-        }
-    }
-}
+  environment {
+    IMAGE_NAME = "notes-api"
+    TAG = "v
