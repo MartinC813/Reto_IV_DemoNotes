@@ -19,30 +19,37 @@ pipeline {
 
     stage("Build Docker Image") {
       steps {
-        script {
-          docker.build("${FULL_IMAGE}:${BUILD_NUMBER}")
-        }
+        sh """
+          docker build -t ${FULL_IMAGE}:${BUILD_NUMBER} .
+        """
       }
     }
 
     stage("Login Docker Hub") {
       steps {
-        withDockerRegistry(credentialsId: "dockerhub-creds", url: "") {
-          echo "Login exitoso"
+        withCredentials([usernamePassword(
+          credentialsId: 'dockerhub-creds',
+          usernameVariable: 'DOCKER_USER',
+          passwordVariable: 'DOCKER_PASS'
+        )]) {
+          sh """
+            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+          """
         }
       }
     }
 
     stage("Push Docker Image") {
       steps {
-        script {
-          docker.image("${FULL_IMAGE}:${BUILD_NUMBER}").push()
-          docker.image("${FULL_IMAGE}:${BUILD_NUMBER}").push("latest")
-        }
+        sh """
+          docker push ${FULL_IMAGE}:${BUILD_NUMBER}
+          docker tag ${FULL_IMAGE}:${BUILD_NUMBER} ${FULL_IMAGE}:latest
+          docker push ${FULL_IMAGE}:latest
+        """
       }
     }
 
-    stage("Deploy a Kubernetes (Rolling Update)") {
+    stage("Deploy Kubernetes (Rolling Update)") {
       steps {
         sh """
           kubectl set image deployment/${K8S_DEPLOYMENT} \
