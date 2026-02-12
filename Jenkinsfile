@@ -6,28 +6,55 @@ apiVersion: v1
 kind: Pod
 spec:
   containers:
-  - name: docker
-    image: docker:24-cli
+  - name: tools
+    image: alpine:3.20
     command:
       - cat
     tty: true
-    volumeMounts:
-    - name: docker-sock
-      mountPath: /var/run/docker.sock
-
-  volumes:
-  - name: docker-sock
-    hostPath:
-      path: /var/run/docker.sock
 """
     }
   }
 
   stages {
-    stage('Build Docker Image') {
+    stage('Info del sistema') {
       steps {
-        container('docker') {
-          sh 'docker build -t martinc813/notes-api:3 .'
+        container('tools') {
+          sh '''
+            echo "Usuario:"
+            whoami
+
+            echo "Kernel:"
+            uname -a
+
+            echo "Fecha:"
+            date
+          '''
+        }
+      }
+    }
+
+    stage('Random task') {
+      steps {
+        container('tools') {
+          sh '''
+            echo "Numero random:"
+            echo $RANDOM
+
+            echo "Listando archivos:"
+            ls -la
+          '''
+        }
+      }
+    }
+
+    stage('Simular build') {
+      steps {
+        container('tools') {
+          sh '''
+            echo "Simulando build..."
+            sleep 2
+            echo "Build completa"
+          '''
         }
       }
     }
