@@ -19,9 +19,7 @@ pipeline {
 
     stage("Build Docker Image") {
       steps {
-        sh """
-          docker build -t ${FULL_IMAGE}:${BUILD_NUMBER} .
-        """
+        sh "docker build -t ${FULL_IMAGE}:${BUILD_NUMBER} ."
       }
     }
 
@@ -32,9 +30,7 @@ pipeline {
           usernameVariable: 'DOCKER_USER',
           passwordVariable: 'DOCKER_PASS'
         )]) {
-          sh """
-            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-          """
+          sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
         }
       }
     }
@@ -49,7 +45,7 @@ pipeline {
       }
     }
 
-    stage("Deploy Kubernetes (Rolling Update)") {
+    stage("Deploy Kubernetes") {
       steps {
         sh """
           kubectl set image deployment/${K8S_DEPLOYMENT} \
