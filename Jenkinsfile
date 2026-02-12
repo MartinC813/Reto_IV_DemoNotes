@@ -61,3 +61,33 @@ pipeline {
     }
   }
 }
+pipeline {
+  agent {
+    kubernetes {
+      yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: builder
+    image: node:18
+    command:
+      - cat
+    tty: true
+"""
+    }
+  }
+
+  stages {
+    stage('Build') {
+      steps {
+        container('builder') {
+          sh '''
+            node --version
+            echo "Building..."
+          '''
+        }
+      }
+    }
+  }
+}
