@@ -6,56 +6,18 @@ apiVersion: v1
 kind: Pod
 spec:
   containers:
-  - name: tools
-    image: alpine:3.20
-    command:
-      - cat
-    tty: true
+  - name: jnlp
+    image: jenkins/inbound-agent:latest
 """
     }
   }
 
   stages {
-    stage('Info del sistema') {
+    stage('Random Task') {
       steps {
-        container('tools') {
-          sh '''
-            echo "Usuario:"
-            whoami
-
-            echo "Kernel:"
-            uname -a
-
-            echo "Fecha:"
-            date
-          '''
-        }
-      }
-    }
-
-    stage('Random task') {
-      steps {
-        container('tools') {
-          sh '''
-            echo "Numero random:"
-            echo $RANDOM
-
-            echo "Listando archivos:"
-            ls -la
-          '''
-        }
-      }
-    }
-
-    stage('Simular build') {
-      steps {
-        container('tools') {
-          sh '''
-            echo "Simulando build..."
-            sleep 2
-            echo "Build completa"
-          '''
-        }
+        sh 'echo Hola desde un pod efímero'
+        sh 'date'
+        sh 'uname -a'
       }
     }
   }
